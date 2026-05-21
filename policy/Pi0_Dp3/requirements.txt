@@ -1,0 +1,42 @@
+# ============================================================
+# SG-DP3 (Semantic-Guided 3D Diffusion Policy) - 依赖清单
+# ============================================================
+#
+# 一键安装:
+#   pip install -r requirements.txt
+#
+# 注意: torch 和 torchvision 建议根据 CUDA 版本单独安装
+#   CUDA 11.8:  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+#   CUDA 12.1:  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+#   CUDA 12.4:  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#   然后再运行: pip install -r requirements.txt
+# ============================================================
+
+# ---- PyTorch 生态 ----
+torch>=2.0.0
+torchvision>=0.15.0
+
+# ---- 数据处理 ----
+numpy>=1.24.0
+h5py>=3.8.0
+zarr>=2.14.0
+
+# ---- 配置管理 ----
+omegaconf>=2.3.0
+
+# ---- 模型构建 ----
+einops>=0.6.0
+
+# ---- 扩散模型 ----
+diffusers>=0.21.0
+
+# ---- VLM (PaliGemma 语义编码器) ----
+# 注: 如果只使用轻量模式 (use_light_vlm=true), transformers 非必需
+#      但推荐安装以保留完整功能
+transformers>=4.35.0
+Pillow>=9.0.0
+huggingface_hub>=0.19.0
+
+# ---- 训练工具 ----
+tqdm>=4.65.0
+termcolor>=2.3.0

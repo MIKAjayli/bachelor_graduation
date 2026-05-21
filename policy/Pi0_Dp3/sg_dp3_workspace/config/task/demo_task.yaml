@@ -1,0 +1,42 @@
+# SG-DP3 Task Configuration: Demo Task
+# ================================================
+# 任务级配置，可覆盖 sg_dp3.yaml 中的默认值
+
+task:
+  name: demo_task
+  description: "Demonstration task for SG-DP3 testing"
+
+  # 任务特定参数 (覆盖 policy 配置)
+  action_dim: 7
+  state_dim: 14
+  num_points: 1024
+
+  # 数据路径
+  data_path: data/demo_task.zarr
+  instruction: "pick up the red block and place it on the green target"
+
+  # 任务特定的训练参数
+  training:
+    num_epochs: 300
+    batch_size: 32
+    lr: 5.0e-5
+
+  # 任务特定的策略参数
+  policy:
+    shape_meta:
+      action:
+        shape: [7]
+      obs:
+        point_cloud:
+          shape: [1024, 3]
+        agent_pos:
+          shape: [14]
+    horizon: 16
+    n_action_steps: 8
+    n_obs_steps: 2
+
+  # 评估参数
+  eval:
+    num_episodes: 50
+    max_steps: 200
+    success_threshold: 0.05  # meters

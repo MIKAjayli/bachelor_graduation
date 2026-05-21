@@ -1,176 +1,301 @@
 <h1 align="center">
-  <a href="https://robotwin-benchmark.github.io"><b>RoboTwin</b> Bimanual Robotic Manipulation Platform<br></a>
+  基于VLM的双臂机器人抓取算法设计<br>
+  <b>SG-DP3: Semantic-Guided 3D Diffusion Policy</b>
 </h1>
-<h2 align="center">Lastest Version: RoboTwin 2.0<br>🤲 <a href="https://robotwin-platform.github.io/">Webpage</a> | <a href="https://robotwin-platform.github.io/doc/">Document</a> | <a href="https://arxiv.org/abs/2506.18088">Paper</a> | <a href="https://robotwin-platform.github.io/doc/community/index.html">Community</a> | <a href="https://robotwin-platform.github.io/leaderboard">Leaderboard</a></h2>
 
-https://private-user-images.githubusercontent.com/88101805/463126988-e3ba1575-4411-4a36-ad65-f0b2f49890c3.mp4
+<p align="center">
+  <i>融合视觉语言模型语义理解与3D扩散策略的双臂机器人操作算法</i><br>
+  基于 <a href="https://github.com/RoboTwin-Platform/RoboTwin">RoboTwin 2.0</a> 双臂仿真平台开发
+</p>
 
-**[2.0 Version (lastest)]** RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation<br>
-<i>Under Review 2025</i>: [Webpage](https://robotwin-platform.github.io/) | [Document](https://robotwin-platform.github.io/doc) | [PDF](https://arxiv.org/pdf/2506.18088) | [arXiv](https://arxiv.org/abs/2506.18088) | [Talk (in Chinese)](https://www.bilibili.com/video/BV18p3izYE63/?spm_id_from=333.337.search-card.all.click) | [机器之心](https://mp.weixin.qq.com/s/SwORezmol2Qd9YdrGYchEA) | [Leaderboard](https://robotwin-platform.github.io/leaderboard)<br>
-> <a href="https://tianxingchen.github.io/">Tianxing Chen</a><sup>\*</sup>, Zanxin Chen<sup>\*</sup>, Baijun Chen<sup>\*</sup>, Zijian Cai<sup>\*</sup>, <a href="https://10-oasis-01.github.io">Yibin Liu</a><sup>\*</sup>, <a href="https://kolakivy.github.io/">Qiwei Liang</a>, Zixuan Li, Xianliang Lin, <a href="https://geyiheng.github.io">Yiheng Ge</a>, Zhenyu Gu, Weiliang Deng, Yubin Guo, Tian Nian, Xuanbing Xie, <a href="https://www.linkedin.com/in/yusen-qin-5b23345b/">Qiangyu Chen</a>, Kailun Su, Tianling Xu, <a href="http://luoping.me/">Guodong Liu</a>, <a href="https://aaron617.github.io/">Mengkang Hu</a>, <a href="https://c7w.tech/about">Huan-ang Gao</a>, Kaixuan Wang, <a href="https://liang-zx.github.io/">Zhixuan Liang</a>, <a href="https://www.linkedin.com/in/yusen-qin-5b23345b/">Yusen Qin</a>, Xiaokang Yang, <a href="http://luoping.me/">Ping Luo</a><sup>†</sup>, <a href="https://yaomarkmu.github.io/">Yao Mu</a><sup>†</sup>
+---
 
-**[RoboTwin Dual-Arm Collaboration Challenge@CVPR'25 MEIS Workshop]** RoboTwin Dual-Arm Collaboration Challenge Technical Report at CVPR 2025 MEIS Workshop<br>
-Official Technical Report: [PDF](https://arxiv.org/pdf/2506.23351) | [arXiv](https://arxiv.org/abs/2506.23351) | [量子位](https://mp.weixin.qq.com/s/qxqs9vvvHsAJ-0hoYANYzQ)<br>
+## 📚 项目简介
 
-**[1.0 Version]** RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins<br>
-Accepted to <i style="color: red; display: inline;"><b>CVPR 2025 (Highlight)</b></i>: [PDF](https://arxiv.org/pdf/2504.13059) | [arXiv](https://arxiv.org/abs/2504.13059)<br>
-> <a href="https://yaomarkmu.github.io/">Yao Mu</a><sup>* †</sup>, <a href="https://tianxingchen.github.io">Tianxing Chen</a><sup>* </sup>, Zanxin Chen<sup>* </sup>, <a href="https://shijiapeng03.github.io">Shijia Peng</a><sup>* </sup>, Zhiqian Lan, Zeyu Gao, Zhixuan Liang, Qiaojun Yu, Yude Zou, Mingkun Xu, Lunkai Lin, Zhiqiang Xie, Mingyu Ding, <a href="http://luoping.me/">Ping Luo</a><sup>†</sup>.
+本仓库是毕业设计 **「基于VLM的双臂机器人抓取算法设计」** 的完整代码，提出了一种 **SG-DP3（Semantic-Guided 3D Diffusion Policy）** 算法，核心思路是将 VLM（Vision Language Model）的语义理解能力与 DP3（3D Diffusion Policy）的3D几何精度相融合，在 RoboTwin 2.0 双臂仿真平台上实现高精度的机器人抓取操作。
 
-**[Early Version]** RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins (early version)<br>
-Accepted to <i style="color: red; display: inline;"><b>ECCV Workshop 2024 (Best Paper Award)</b></i>: [PDF](https://arxiv.org/pdf/2409.02920) | [arXiv](https://arxiv.org/abs/2409.02920)<br>
-> <a href="https://yaomarkmu.github.io/">Yao Mu</a><sup>* †</sup>, <a href="https://tianxingchen.github.io">Tianxing Chen</a><sup>* </sup>, Shijia Peng<sup>*</sup>, Zanxin Chen<sup>*</sup>, Zeyu Gao, Zhiqian Lan, Yude Zou, Lunkai Lin, Zhiqiang Xie, <a href="http://luoping.me/">Ping Luo</a><sup>†</sup>.
+同时，本仓库还包含一个基于 PyQt5 开发的 **SG-DP3 智能控制台**，用于数据预处理、训练监控、仿真评估的全流程可视化管理。
 
+### 核心创新点
 
+1. **语义提纯（Semantic Purification）**：利用 VLM（PaliGemma / 轻量CNN）生成2D语义分割掩码，将3D点云过滤为仅包含目标物体的子集，消除背景干扰。
+2. **级联解耦条件注入（Cascaded Decoupled Injection）**：在去噪网络中通过时间步动态混合语义条件和几何条件，`w_sem = τ/T_max, w_geo = 1 - w_sem`，实现从语义引导到几何精度的渐进式控制。
+3. **Temporal Ensembling 推理优化**：指数加权平均重叠预测，平滑轨迹输出，配合夹爪锁定机制提升抓取稳定性。
 
-# 📚 Overview
+### 算法架构总览
 
-| Branch Name | Link |
-|-------------|------|
-| 2.0 Version Branch | [main](https://github.com/RoboTwin-Platform/RoboTwin/tree/main) (latest) |
-| IsaacLab-Arena Branch | [IsaacLab-Arena](https://github.com/RoboTwin-Platform/RoboTwin/tree/IsaacLab-Arena) |
-| RLinf Branch | [RLinf_support](https://github.com/RoboTwin-Platform/RoboTwin/tree/RLinf_support) |
-| WBCD 2026 Branch | [WBCD-2026](https://github.com/RoboTwin-Platform/RoboTwin/tree/WBCD-2026) |
-| 1.0 Version Branch | [1.0 Version](https://github.com/RoboTwin-Platform/RoboTwin/tree/RoboTwin-1.0) |
-| 1.0 Version Code Generation Branch | [1.0 Version GPT](https://github.com/RoboTwin-Platform/RoboTwin/tree/gpt) |
-| Early Version Branch | [Early Version](https://github.com/RoboTwin-Platform/RoboTwin/tree/early_version) |
-| 第十九届“挑战杯”人工智能专项赛分支 | [Challenge-Cup-2025](https://github.com/RoboTwin-Platform/RoboTwin/tree/Challenge-Cup-2025) |
-| CVPR 2025 Challenge Round 1 Branch | [CVPR-Challenge-2025-Round1](https://github.com/RoboTwin-Platform/RoboTwin/tree/CVPR-Challenge-2025-Round1) |
-| CVPR 2025 Challenge Round 2 Branch | [CVPR-Challenge-2025-Round2](https://github.com/RoboTwin-Platform/RoboTwin/tree/CVPR-Challenge-2025-Round2) |
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SG-DP3 Pipeline                        │
+│                                                           │
+│  Image + Instruction                                      │
+│       │                                                   │
+│       ▼                                                   │
+│  ┌──────────────┐    ┌──────────────┐                     │
+│  │ Pi0Semantic  │───▶│  2D Mask     │                     │
+│  │  Wrapper     │    └──────┬───────┘                     │
+│  └──────┬───────┘           │                             │
+│         │ c_sem             ▼                             │
+│         │         ┌──────────────────┐                    │
+│         │         │  Semantic        │                    │
+│         │         │   Purification   │                    │
+│         │         └────────┬─────────┘                    │
+│         │                  │ purified points               │
+│         │                  ▼                               │
+│         │         ┌──────────────────┐                     │
+│         │         │  PointNet        │                     │
+│         │         │   Encoder        │───▶ c_geo          │
+│         │         └──────────────────┘                     │
+│         │                  │                               │
+│         ▼                  ▼                               │
+│  ┌─────────────────────────────────────┐                  │
+│  │    Cascaded Unet1D (Denoiser)       │                  │
+│  │    w_sem * c_sem + w_geo * c_geo    │                  │
+│  └─────────────────────────────────────┘                  │
+│         │                                                 │
+│         ▼                                                 │
+│    Predicted Action                                       │
+└──────────────────────────────────────────────────────────┘
+```
 
+---
 
+## 🗂️ 项目结构
 
-# 🐣 Update
-* **2026/03/03**, We release [RMBench](https://github.com/RoboTwin-Platform/RMBench), which is a memory-dependent manipulation benchmark built upon RoboTwin 2.0.
-* **2026/02/20**, Usage supported in <a href="https://github.com/starVLA/starVLA">StarVLA</a>, which is a user-friendly codebase for VLA development.
-* **2026/01/23**, We update IsaacLab-Arena and <a href="https://github.com/RLinf/RLinf">RLinf</a> support (contributed by RLinf team).
-* **2025/08/28**, We update the RoboTwin 2.0 Paper [PDF](https://arxiv.org/pdf/2506.18088).
-* **2025/08/25**, We fix ACT deployment code and update the [leaderboard](https://robotwin-platform.github.io/leaderboard).
-* **2025/08/06**, We release RoboTwin 2.0 Leaderboard: [leaderboard website](https://robotwin-platform.github.io/leaderboard).
-* **2025/07/23**, RoboTwin 2.0 received Outstanding Poster at ChinaSI 2025 (Ranking 1st).
-* **2025/07/19**, We Fix DP3 evaluation code error. We will update RoboTwin 2.0 paper next week.
-* **2025/07/09**, We update endpose control mode, please see [[RoboTwin Doc - Usage - Control Robot](https://robotwin-platform.github.io/doc/usage/control-robot.html)] for more details.
-* **2025/07/08**, We upload [Challenge-Cup-2025](https://github.com/RoboTwin-Platform/RoboTwin/tree/Challenge-Cup-2025) Branch (第十九届挑战杯分支).
-* **2025/07/02**, Fix Piper Wrist Bug [[issue](https://github.com/RoboTwin-Platform/RoboTwin/issues/104)]. Please redownload the embodiment asset.
-* **2025/07/01**, We release Technical Report of RoboTwin Dual-Arm Collaboration Challenge @ CVPR 2025 MEIS Workshop [[arXiv](https://arxiv.org/abs/2506.23351)] !
-* **2025/06/21**, We release RoboTwin 2.0 [[Webpage](https://robotwin-platform.github.io/)] !
-* **2025/04/11**, RoboTwin is seclected as <i>CVPR Highlight paper</i>!
-* **2025/02/27**, RoboTwin is accepted to <i>CVPR 2025</i> ! 
-* **2024/09/30**, RoboTwin (Early Version) received <i>the Best Paper Award  at the ECCV Workshop</i>!
-* **2024/09/20**, Officially released RoboTwin.
+```
+.
+├── policy/
+│   └── Pi0_Dp3/                         # SG-DP3 核心算法
+│       ├── deploy_policy.py              # RoboTwin 评估接口 (get_model / eval / reset_model)
+│       ├── deploy_policy.yml             # 评估参数配置
+│       ├── process_data.sh               # 数据预处理脚本
+│       ├── train.sh                      # 训练启动脚本
+│       ├── eval.sh                       # 评估启动脚本
+│       ├── requirements.txt              # Python 依赖
+│       ├── sg_dp3_workspace/
+│       │   ├── config/
+│       │   │   └── sg_dp3.yaml           # 主配置文件
+│       │   ├── dataset/
+│       │   │   └── multimodal_dataset.py # 多模态数据集
+│       │   ├── model/
+│       │   │   ├── semantic/
+│       │   │   │   ├── pi0_wrapper.py    # VLM 语义编码器 (PaliGemma / 轻量CNN)
+│       │   │   │   └── purification.py   # 语义提纯模块
+│       │   │   ├── vision/
+│       │   │   │   └── pointnet.py       # PointNet 几何编码器
+│       │   │   └── diffusion/
+│       │   │       ├── cascaded_unet.py  # 级联解耦 U-Net 去噪网络
+│       │   │       └── ddim_scheduler.py # DDIM 调度器
+│       │   ├── policy/
+│       │   │   └── sg_dp3_policy.py      # SG-DP3 总体策略
+│       │   ├── train_sg_dp3.py           # 训练入口
+│       │   └── eval_sg_dp3.py            # 独立评估入口
+│       └── scripts/
+│           └── process_data.py           # 数据预处理实现
+│
+├── sgdp3_console/                        # SG-DP3 智能控制台 (PyQt5)
+│   ├── main.py                           # 主入口
+│   ├── sidebar.py                        # 侧边栏导航
+│   ├── styles/
+│   │   └── theme.py                      # 全局主题样式
+│   └── pages/
+│       ├── page_dashboard.py             # 仪表盘: 系统状态 / 数据总览
+│       ├── page_preprocess.py            # 数据预处理: 自动扫描 / Zarr 转换
+│       ├── page_train_monitor.py         # 训练监控: 损失曲线 / 3D 点云可视化
+│       └── page_eval.py                  # 仿真评估: 成功率 / 轨迹 / 误差曲线
+│
+├── envs/                                 # RoboTwin 任务环境
+├── script/                               # 数据采集与评估脚本
+├── data/                                 # 采集数据目录
+├── task_config/                          # 任务配置
+├── code_gen/                             # GPT 代码生成模块
+├── description/                          # 任务描述与 Prompt
+└── collect_data.sh                       # 数据采集脚本
+```
 
-# 🛠️ Installation
+---
 
-See [RoboTwin 2.0 Document (Usage - Install & Download)](https://robotwin-platform.github.io/doc/usage/robotwin-install.html) for installation instructions. It takes about 20 minutes for installation.
+## 🛠️ 安装
 
-# 🤷‍♂️ Tasks Informations
-See [RoboTwin 2.0 Tasks Doc](https://robotwin-platform.github.io/doc/tasks/index.html) for more details.
+### 1. 环境要求
+
+- Python 3.8+
+- CUDA 11.8 / 12.1 / 12.4
+- PyTorch ≥ 2.0
+
+### 2. 安装 RoboTwin 2.0 平台
+
+请参考 [RoboTwin 2.0 官方安装文档](https://robotwin-platform.github.io/doc/usage/robotwin-install.html) 完成仿真平台安装（约 20 分钟）。
+
+### 3. 安装 SG-DP3 依赖
+
+```bash
+# 安装 PyTorch (根据 CUDA 版本选择)
+# CUDA 12.1:
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# 安装 SG-DP3 依赖
+cd policy/Pi0_Dp3
+pip install -r requirements.txt
+```
+
+### 4. 安装控制台依赖（可选）
+
+```bash
+pip install PyQt5 pyqtgraph PyOpenGL psutil matplotlib
+```
+
+---
+
+## 🧑🏻‍💻 使用方法
+
+### 🖥️ 方式一：使用智能控制台（推荐）
+
+启动 PyQt5 可视化控制台，一站式完成数据预处理 → 训练 → 评估全流程：
+
+```bash
+cd sgdp3_console
+python main.py
+```
+
+控制台提供四大功能模块：
+
+| 模块 | 功能 |
+|------|------|
+| 📊 仪表盘 | 系统状态监控 (CPU/GPU/内存)、数据集总览、Checkpoint 管理、全局日志 |
+| ⚙️ 数据预处理 | 自动扫描数据集、下拉选择任务/配置、Zarr 格式转换、实时终端输出 |
+| 📈 训练监控 | 训练配置管理、损失曲线实时可视化、3D 点云/2D 掩码语义引导可视化 |
+| 🕹️ 仿真评估 | 自动扫描 Checkpoint、成功率统计、轨迹 3D 可视化、误差曲线分析 |
+
+### 💻 方式二：命令行操作
+
+#### 数据采集
+
+使用 RoboTwin 2.0 平台采集仿真数据：
+
+```bash
+bash collect_data.sh ${task_name} ${task_config} ${gpu_id}
+# 示例: bash collect_data.sh beat_block_hammer demo_randomized 0
+```
+
+#### 数据预处理
+
+将采集的原始数据转换为 Zarr 训练格式：
+
+```bash
+cd policy/Pi0_Dp3
+bash process_data.sh ${task_name} ${task_config} ${expert_data_num}
+# 示例: bash process_data.sh beat_block_hammer demo_clean 50
+```
+
+#### 训练
+
+```bash
+cd policy/Pi0_Dp3
+bash train.sh ${task_name} ${task_config} ${expert_data_num} ${seed} ${gpu_id}
+# 示例: bash train.sh beat_block_hammer demo_clean 50 42 0
+```
+
+#### 评估
+
+在 RoboTwin 仿真环境中评估训练好的模型：
+
+```bash
+cd policy/Pi0_Dp3
+bash eval.sh ${task_name} ${task_config} ${ckpt_setting} ${expert_data_num} ${seed} ${gpu_id}
+# 示例: bash eval.sh beat_block_hammer demo_clean sg_dp3-train 50 42 0
+```
+
+---
+
+## 🔬 SG-DP3 算法详解
+
+### 模块组成
+
+#### 1. VLM 语义编码器 (`pi0_wrapper.py`)
+
+基于 PaliGemma（SigLIP + Gemma）视觉语言模型，冻结 VLM 权重，附加自定义 MLP 分割头：
+- 输入：RGB 图像 + 自然语言指令
+- 输出：2D 语义分割掩码 + 语义特征 `c_sem`
+- 支持 **轻量模式**（纯 PyTorch CNN，无需 HuggingFace 认证）和 **完整模式**（PaliGemma，需约 6GB 显存）
+
+#### 2. 语义提纯模块 (`purification.py`)
+
+核心创新 —— 将 2D 语义掩码映射到 3D 空间，过滤背景点云：
+- 利用可学习投影矩阵将 3D 点投影到 2D 平面
+- 用 2D 掩码过滤投影点，提取目标相关点云
+- 当过滤后点数不足时，使用有放回重采样确保点数达标
+
+#### 3. PointNet 几何编码器 (`pointnet.py`)
+
+编码语义提纯后的3D点云，输出几何特征 `c_geo`。迁移自 DP3 基线，核心结构保持不变。
+
+#### 4. 级联解耦去噪网络 (`cascaded_unet.py`)
+
+核心创新 —— 时间步动态条件混合：
+- 通过 `w_sem = τ/T_max` 和 `w_geo = 1 - w_sem` 动态调节两种条件权重
+- 早期去噪步骤侧重语义引导（大尺度结构），后期侧重几何精度（精细调整）
+- 使用级联自适应层归一化（Cascaded AdaLN）注入条件
+
+#### 5. 推理优化 (`deploy_policy.py`)
+
+- **Temporal Ensembling**：指数加权平均重叠预测，平滑轨迹
+- **夹爪锁定**：一旦夹爪闭合（抓到物体），强制保持闭合状态
+- **滑动窗口推理**：维护最近 `n_obs_steps` 帧观测窗口
+
+### 关键超参数
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `horizon` | 8 | 动作序列总长度 |
+| `n_action_steps` | 6 | 实际执行步数 |
+| `n_obs_steps` | 3 | 观测步数 |
+| `num_train_timesteps` | 100 | 训练扩散步数 |
+| `num_inference_steps` | 10 | 推理扩散步数 |
+| `semantic_feature_dim` | 576 | 语义特征维度 |
+| `purification_num_points` | 1024 | 提纯后最少点数 |
+
+---
+
+## 📊 平台说明
+
+本项目基于 [RoboTwin 2.0](https://robotwin-platform.github.io/) 双臂机器人仿真平台开发，包含 50+ 操作任务，支持强域随机化。
 
 <p align="center">
   <img src="./assets/files/50_tasks.gif" width="100%">
 </p>
 
-# 🧑🏻‍💻 Usage 
+---
 
-## Document
+## 👍 致谢
 
-> Please Refer to [RoboTwin 2.0 Document (Usage)](https://robotwin-platform.github.io/doc/usage/index.html) for more details.
+- **仿真平台**：[RoboTwin 2.0](https://github.com/RoboTwin-Platform/RoboTwin) — 双臂机器人操作仿真与基准测试平台
+- **基线算法**：[DP3](https://robotwin-platform.github.io/doc/usage/DP3.html)（3D Diffusion Policy）和 [Pi0](https://robotwin-platform.github.io/doc/usage/Pi0.html)（VLM Policy）
+- **VLM 模型**：[PaliGemma](https://huggingface.co/google/paligemma-3b-mix-224)（Google 视觉语言模型）
 
-## Data Collection
-We provide over 100,000 pre-collected trajectories as part of the open-source release [RoboTwin Dataset](https://huggingface.co/datasets/TianxingChen/RoboTwin2.0/tree/main/dataset).
-However, we strongly recommend users to perform data collection themselves due to the high configurability and diversity of task and embodiment setups.
+---
 
-<img src="./assets/files/domain_randomization.png" alt="description" style="display: block; margin: auto; width: 100%;">
+## 📄 参考文献
 
-## 1. Task Running and Data Collection
-Running the following command will first search for a random seed for the target collection quantity, and then replay the seed to collect data.
-
-```
-bash collect_data.sh ${task_name} ${task_config} ${gpu_id}
-# Example: bash collect_data.sh beat_block_hammer demo_randomized 0
-```
-
-## 2. Modify Task Config
-☝️ See [RoboTwin 2.0 Tasks Configurations Doc](https://robotwin-platform.github.io/doc/usage/configurations.html) for more details.
-
-# 🚴‍♂️ Policy Baselines
-## Policies Support
-[DP](https://robotwin-platform.github.io/doc/usage/DP.html), [ACT](https://robotwin-platform.github.io/doc/usage/ACT.html), [DP3](https://robotwin-platform.github.io/doc/usage/DP3.html), [RDT](https://robotwin-platform.github.io/doc/usage/RDT.html), [PI0](https://robotwin-platform.github.io/doc/usage/Pi0.html), [OpenVLA-oft](https://robotwin-platform.github.io/doc/usage/OpenVLA-oft.html)
-
-[TinyVLA](https://robotwin-platform.github.io/doc/usage/TinyVLA.html), [DexVLA](https://robotwin-platform.github.io/doc/usage/DexVLA.html) (Contributed by Media Group)
-
-[LLaVA-VLA](https://robotwin-platform.github.io/doc/usage/LLaVA-VLA.html) (Contributed by IRPN Lab, HKUST(GZ))
-
-[GO-1](https://robotwin-platform.github.io/doc/usage/GO1.html) (Contributed by GO-1 Team)
-
-Deploy Your Policy: [Guidance](https://robotwin-platform.github.io/doc/usage/deploy-your-policy.html)
-
-⏰ TODO: G3Flow, HybridVLA, SmolVLA, AVR, UniVLA
-
-# 🏄‍♂️ Experiment & LeaderBoard
-
-> We recommend that the RoboTwin Platform can be used to explore the following topics: 
-> 1. single - task fine - tuning capability
-> 2. visual robustness
-> 3. language diversity robustness (language condition)
-> 4. multi-tasks capability
-> 5. cross-embodiment performance
-
-The full leaderboard and setting can be found in: [https://robotwin-platform.github.io/leaderboard](https://robotwin-platform.github.io/leaderboard).
-
-# 💽 Pre-collected Large-scale Dataset
-
-Please refer to [RoboTwin 2.0 Dataset - Huggingface](https://huggingface.co/datasets/TianxingChen/RoboTwin2.0/tree/main/dataset).
-
-# 👍 Citations
-If you find our work useful, please consider citing:
-
-<b>RoboTwin 2.0</b>: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation
-```
+```bibtex
 @article{chen2025robotwin,
   title={Robotwin 2.0: A scalable data generator and benchmark with strong domain randomization for robust bimanual robotic manipulation},
-  author={Chen, Tianxing and Chen, Zanxin and Chen, Baijun and Cai, Zijian and Liu, Yibin and Li, Zixuan and Liang, Qiwei and Lin, Xianliang and Ge, Yiheng and Gu, Zhenyu and others},
+  author={Chen, Tianxing and Chen, Zanxin and Chen, Baijun and Cai, Zijian and Liu, Yibin and others},
   journal={arXiv preprint arXiv:2506.18088},
   year={2025}
 }
-```
 
-<b>RoboTwin</b>: Dual-Arm Robot Benchmark with Generative Digital Twins, accepted to <i style="color: red; display: inline;"><b>CVPR 2025 (Highlight)</b></i>
-```
 @InProceedings{Mu_2025_CVPR,
-    author    = {Mu, Yao and Chen, Tianxing and Chen, Zanxin and Peng, Shijia and Lan, Zhiqian and Gao, Zeyu and Liang, Zhixuan and Yu, Qiaojun and Zou, Yude and Xu, Mingkun and Lin, Lunkai and Xie, Zhiqiang and Ding, Mingyu and Luo, Ping},
+    author    = {Mu, Yao and Chen, Tianxing and Chen, Zanxin and Peng, Shijia and others},
     title     = {RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins},
-    booktitle = {Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR)},
-    month     = {June},
+    booktitle = {CVPR},
     year      = {2025},
     pages     = {27649-27660}
 }
 ```
 
-Benchmarking Generalizable Bimanual Manipulation: RoboTwin Dual-Arm Collaboration Challenge at CVPR 2025 MEIS Workshop
-```
-@article{chen2025benchmarking,
-  title={Benchmarking Generalizable Bimanual Manipulation: RoboTwin Dual-Arm Collaboration Challenge at CVPR 2025 MEIS Workshop},
-  author={Chen, Tianxing and Wang, Kaixuan and Yang, Zhaohui and Zhang, Yuhao and Chen, Zanxin and Chen, Baijun and Dong, Wanxi and Liu, Ziyuan and Chen, Dong and Yang, Tianshuo and others},
-  journal={arXiv preprint arXiv:2506.23351},
-  year={2025}
-}
-```
+---
 
-<b>RoboTwin</b>: Dual-Arm Robot Benchmark with Generative Digital Twins (early version), accepted to <i style="color: red; display: inline;"><b>ECCV Workshop 2024 (Best Paper Award)</b></i>
-```
-@article{mu2024robotwin,
-  title={RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins (early version)},
-  author={Mu, Yao and Chen, Tianxing and Peng, Shijia and Chen, Zanxin and Gao, Zeyu and Zou, Yude and Lin, Lunkai and Xie, Zhiqiang and Luo, Ping},
-  journal={arXiv preprint arXiv:2409.02920},
-  year={2024}
-}
-```
+## 🏷️ 许可证
 
-# 😺 Acknowledgement
-
-**Software Support**: D-Robotics, **Hardware Support**: AgileX Robotics, **AIGC Support**: Deemos.
-
-Contact [Tianxing Chen](https://tianxingchen.github.io) if you have any questions or suggestions.
-
-# 🏷️ License
-This repository is released under the MIT license. See [LICENSE](./LICENSE) for additional details.
+本项目基于 MIT 许可证发布。详见 [LICENSE](./LICENSE)。

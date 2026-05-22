@@ -326,6 +326,33 @@ def parse_args(input_args=None):
         required=True,
     )
 
+    # ============ LoRA Arguments ============
+    parser.add_argument(
+        "--use_lora",
+        action="store_true",
+        default=False,
+        help="Whether to use LoRA (Low-Rank Adaptation) for parameter-efficient fine-tuning.",
+    )
+    parser.add_argument(
+        "--lora_rank",
+        type=int,
+        default=8,
+        help="LoRA rank (r). Higher rank = more capacity but more parameters.",
+    )
+    parser.add_argument(
+        "--lora_alpha",
+        type=float,
+        default=16.0,
+        help="LoRA scaling factor. Effective scaling = alpha / rank.",
+    )
+    parser.add_argument(
+        "--lora_dropout",
+        type=float,
+        default=0.0,
+        help="Dropout probability for LoRA layers.",
+    )
+    # ==========================================
+
     if input_args is not None:
         args = parser.parse_args(input_args)
     else:

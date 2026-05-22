@@ -154,7 +154,21 @@ class RoboticDiffusionTransformerModel(object):
         filename = os.path.basename(pretrained)
         if filename.endswith(".pt"):
             checkpoint = torch.load(pretrained)
-            self.policy.load_state_dict(checkpoint["module"])
+            state_dict = checkpoint["module"]
+
+            # Check if this is a LoRA checkpoint (contains lora_A/lora_B keys)
+            has_lora = any('lora_A' in k or 'lora_B' in k for k in state_dict.keys())
+            if has_lora:
+                from models.rdt.blocks import merge_lora_weights
+                # First apply LoRA structure to model, then load state dict
+                from models.rdt.blocks import apply_lora_to_model
+                apply_lora_to_model(self.policy, rank=8, alpha=16.0)
+                self.policy.load_state_dict(state_dict, strict=False)
+                # Merge LoRA weights into base weights for inference
+                merge_lora_weights(self.policy)
+                print("[LoRA] Loaded and merged LoRA weights for inference.")
+            else:
+                self.policy.load_state_dict(state_dict)
         elif filename.endswith(".safetensors"):
             from safetensors.torch import load_model
 

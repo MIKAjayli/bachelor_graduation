@@ -190,11 +190,89 @@ bash process_data.sh ${task_name} ${task_config} ${expert_data_num}
 
 #### 训练
 
+##### SG-DP3（本项目核心算法）
+
 ```bash
 cd policy/Pi0_Dp3
 bash train.sh ${task_name} ${task_config} ${expert_data_num} ${seed} ${gpu_id}
 # 示例: bash train.sh beat_block_hammer demo_clean 50 42 0
 ```
+
+##### RDT（Robotics Diffusion Transformer）
+
+**全量微调**（需要多卡，使用 DeepSpeed ZeRO-2）：
+
+```bash
+cd policy/RDT
+bash finetune.sh ${task_name} ${task_config} ${expert_data_num} ${seed} ${gpu_ids}
+# 示例: bash finetune.sh beat_block_hammer demo_clean 50 42 0,1,2,3
+```
+
+**LoRA 微调**（✅ 单卡 RTX 4090 可用）：
+
+```bash
+cd policy/RDT
+bash finetune_lora.sh ${task_name} ${task_config} ${expert_data_num} ${seed} ${gpu_id}
+# 示例: bash finetune_lora.sh beat_block_hammer demo_clean 50 42 0
+```
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `--use_lora` | False | 启用 LoRA 微调 |
+| `--lora_rank` | 8 | LoRA 秩（r） |
+| `--lora_alpha` | 16.0 | LoRA 缩放因子 |
+| `--lora_dropout` | 0.0 | LoRA Dropout |
+
+##### pi0（OpenPI）
+
+**全量微调**（需要多卡）：
+
+```bash
+cd policy/pi0
+bash finetune.sh pi0_base_aloha_robotwin_full ${model_name} ${gpu_ids}
+# 示例: bash finetune.sh pi0_base_aloha_robotwin_full my_task_full 0,1,2,3
+```
+
+**LoRA 微调**（✅ 单卡 RTX 4090 可用）：
+
+```bash
+cd policy/pi0
+bash finetune_lora.sh ${model_name} ${gpu_id}
+# 示例: bash finetune_lora.sh my_task_lora 0
+```
+
+> pi0 内置 LoRA 支持（`gemma_2b_lora` + `gemma_300m_lora`），训练配置名：`pi0_base_aloha_robotwin_lora`
+
+##### pi05（OpenPI pi0.5）
+
+**全量微调**：
+
+```bash
+cd policy/pi05
+bash finetune.sh pi05_aloha_full_base ${model_name} ${gpu_id}
+# 示例: bash finetune.sh pi05_aloha_full_base my_task_full 0
+```
+
+**LoRA 微调**（✅ 单卡 RTX 4090 可用）：
+
+```bash
+cd policy/pi05
+bash finetune_lora.sh ${model_name} ${gpu_id}
+# 示例: bash finetune_lora.sh my_task_lora 0
+```
+
+> pi05 训练配置名：`pi05_aloha_lora_base`，使用 `gemma_2b_lora` + `gemma_300m_lora`
+
+##### 训练方式对比
+
+| 策略 | 全量微调 | LoRA 微调 | 显存需求（估算） |
+|------|---------|-----------|----------------|
+| **SG-DP3** | `train.sh` | — | ~8GB（单卡） |
+| **RDT** | `finetune.sh`（DeepSpeed ZeRO-2，多卡） | `finetune_lora.sh`（单卡） | LoRA: ~18GB |
+| **pi0** | `finetune.sh`（多卡） | `finetune_lora.sh`（单卡） | LoRA: ~20GB |
+| **pi05** | `finetune.sh`（单卡） | `finetune_lora.sh`（单卡） | LoRA: ~20GB |
+
+> **提示**：LoRA 微调仅更新少量低秩适配器参数（通常 < 总参数量的 1%），可大幅降低显存占用，适合在单张 RTX 4090 (24GB) 上进行实验。
 
 #### 评估
 

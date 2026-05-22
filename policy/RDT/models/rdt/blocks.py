@@ -22,6 +22,178 @@ from timm.models.vision_transformer import Attention, Mlp, RmsNorm, use_fused_at
 
 
 #################################################################################
+#                          LoRA Linear Layer                                    #
+#################################################################################
+
+class LoRALinear(nn.Module):
+    """
+    LoRA (Low-Rank Adaptation) wrapper for nn.Linear.
+
+    Replaces a frozen nn.Linear with: output = W_frozen @ x + (B @ A) @ x * alpha / r
+
+    Args:
+        original_linear: The original nn.Linear layer to wrap (will be frozen).
+        rank: LoRA rank (r).
+        alpha: LoRA scaling factor.
+        dropout: Dropout probability applied before LoRA.
+    """
+
+    def __init__(
+        self,
+        original_linear: nn.Linear,
+        rank: int = 8,
+        alpha: float = 16.0,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        self.in_features = original_linear.in_features
+        self.out_features = original_linear.out_features
+        self.rank = rank
+        self.alpha = alpha
+        self.scaling = alpha / rank
+
+        # Freeze the original linear layer
+        self.weight = original_linear.weight
+        self.bias = original_linear.bias
+        self.weight.requires_grad_(False)
+        if self.bias is not None:
+            self.bias.requires_grad_(False)
+
+        # LoRA low-rank matrices
+        self.lora_A = nn.Parameter(torch.zeros(rank, self.in_features))
+        self.lora_B = nn.Parameter(torch.zeros(self.out_features, rank))
+
+        # Dropout
+        self.lora_dropout = nn.Dropout(p=dropout) if dropout > 0.0 else nn.Identity()
+
+        # Initialize: A with kaiming, B with zeros → LoRA starts as identity
+        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+        nn.init.zeros_(self.lora_B)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Base linear (frozen)
+        result = F.linear(x, self.weight, self.bias)
+        # LoRA path
+        lora_input = self.lora_dropout(x)
+        lora_output = (lora_input @ self.lora_A.T) @ self.lora_B.T
+        result = result + lora_output * self.scaling
+        return result
+
+
+def apply_lora_to_model(model: nn.Module, rank: int = 8, alpha: float = 16.0, dropout: float = 0.0):
+    """
+    Apply LoRA to all Linear layers in RDT transformer blocks.
+
+    Specifically targets:
+      - RDTBlock.attn (self-attention qkv + proj)
+      - RDTBlock.cross_attn (cross-attention q, kv, proj)
+      - RDTBlock.ffn (feed-forward)
+
+    Skips: adaptors, embedders, positional embeddings, final layer.
+
+    Args:
+        model: The RDT model (nn.Module).
+        rank: LoRA rank.
+        alpha: LoRA scaling factor.
+        dropout: LoRA dropout.
+    """
+    # Target the transformer blocks specifically
+    # blocks are in model.model.blocks (inside RDTRunner -> RDT)
+    if hasattr(model, 'model') and hasattr(model.model, 'blocks'):
+        blocks = model.model.blocks
+    elif hasattr(model, 'blocks'):
+        blocks = model.blocks
+    else:
+        raise ValueError("Cannot find transformer blocks in the model.")
+
+    count = 0
+    for block in blocks:
+        count += _apply_lora_to_block(block, rank, alpha, dropout)
+
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"[LoRA] Applied to {count} Linear layers. "
+          f"Trainable: {trainable_params:,} / {total_params:,} "
+          f"({100 * trainable_params / total_params:.2f}%)")
+    return model
+
+
+def _apply_lora_to_block(block: nn.Module, rank: int, alpha: float, dropout: float) -> int:
+    """Apply LoRA to all nn.Linear layers within a single transformer block."""
+    count = 0
+    for name, module in block.named_modules():
+        if isinstance(module, nn.Linear):
+            # Get the parent module and attribute name
+            parts = name.rsplit('.', 1)
+            if len(parts) == 2:
+                parent_name, attr_name = parts
+                parent = dict(block.named_modules())[parent_name]
+            else:
+                parent = block
+                attr_name = name
+
+            # Replace the Linear with LoRALinear
+            lora_layer = LoRALinear(module, rank=rank, alpha=alpha, dropout=dropout)
+            setattr(parent, attr_name, lora_layer)
+            count += 1
+    return count
+
+
+def freeze_non_lora_params(model: nn.Module):
+    """
+    Freeze all parameters except LoRA parameters (lora_A, lora_B).
+
+    This ensures only the LoRA adapters are updated during fine-tuning.
+    """
+    for name, param in model.named_parameters():
+        if 'lora_A' in name or 'lora_B' in name:
+            param.requires_grad = True
+        else:
+            param.requires_grad = False
+
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
+    print(f"[LoRA Freeze] Trainable: {trainable:,} / {total:,} ({100 * trainable / total:.2f}%)")
+
+
+def merge_lora_weights(model: nn.Module):
+    """
+    Merge LoRA weights back into the base weights for inference.
+    W_merged = W_base + (B @ A) * (alpha / rank)
+
+    After merging, LoRA parameters are removed to reduce model size.
+    """
+    merged_count = 0
+    modules_to_replace = []
+
+    for name, module in model.named_modules():
+        if isinstance(module, LoRALinear):
+            # Merge: W = W + B @ A * scaling
+            merged_weight = module.weight.data + (module.lora_B.data @ module.lora_A.data) * module.scaling
+            # Create a new plain nn.Linear
+            new_linear = nn.Linear(module.in_features, module.out_features, bias=module.bias is not None)
+            new_linear.weight.data.copy_(merged_weight)
+            if module.bias is not None:
+                new_linear.bias.data.copy_(module.bias.data)
+
+            modules_to_replace.append((name, new_linear))
+            merged_count += 1
+
+    # Replace LoRALinear modules with merged nn.Linear
+    for full_name, new_module in modules_to_replace:
+        parts = full_name.rsplit('.', 1)
+        if len(parts) == 2:
+            parent_name, attr_name = parts
+            parent = dict(model.named_modules())[parent_name]
+        else:
+            parent = model
+            attr_name = full_name
+        setattr(parent, attr_name, new_module)
+
+    print(f"[LoRA Merge] Merged {merged_count} LoRA layers into base weights.")
+
+
+#################################################################################
 #               Embedding Layers for Timesteps and Condition Inptus             #
 #################################################################################
 class TimestepEmbedder(nn.Module):

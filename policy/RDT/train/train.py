@@ -36,6 +36,7 @@ from models.ema_model import EMAModel
 from models.multimodal_encoder.siglip_encoder import SiglipVisionTower
 from models.multimodal_encoder.t5_encoder import T5Embedder
 from models.rdt_runner import RDTRunner
+from models.rdt.blocks import apply_lora_to_model, freeze_non_lora_params, merge_lora_weights
 from train.dataset import DataCollatorForVLAConsumerDataset, VLAConsumerDataset
 from train.sample import log_sample_res
 
@@ -209,6 +210,20 @@ def train(args, logger):
         # TODO:
         raise NotImplementedError("Gradient checkpointing is not yet implemented.")
 
+    # ============ LoRA Fine-tuning ============
+    # Apply LoRA to transformer blocks and freeze base model
+    if args.use_lora:
+        logger.info("Applying LoRA to RDT transformer blocks...")
+        apply_lora_to_model(
+            rdt,
+            rank=args.lora_rank,
+            alpha=args.lora_alpha,
+            dropout=args.lora_dropout,
+        )
+        freeze_non_lora_params(rdt)
+        logger.info(f"LoRA applied: rank={args.lora_rank}, alpha={args.lora_alpha}")
+    # ===========================================
+
     # Enable TF32 for faster training on Ampere GPUs,
     # cf https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices
     if args.allow_tf32:
@@ -230,7 +245,12 @@ def train(args, logger):
         optimizer_class = torch.optim.AdamW
 
     # Optimizer creation
-    params_to_optimize = rdt.parameters()
+    # Only optimize LoRA parameters if LoRA is enabled
+    if args.use_lora:
+        params_to_optimize = [p for p in rdt.parameters() if p.requires_grad]
+        logger.info(f"Optimizing {sum(p.numel() for p in params_to_optimize):,} LoRA parameters")
+    else:
+        params_to_optimize = rdt.parameters()
     optimizer = optimizer_class(
         params_to_optimize,
         lr=args.learning_rate,

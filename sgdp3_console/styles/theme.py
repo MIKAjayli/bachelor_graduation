@@ -16,6 +16,36 @@ ACCENT_PURPLE = "#9B59B6"
 SIDEBAR_BG    = "#FFFFFF"
 SIDEBAR_SEL   = "#E8F4FF"
 
+# ─── Inferno 科学配色查找表 (荧光热力图风格) ───
+import numpy as np
+
+def _build_inferno_lut(n=256):
+    """从9个控制点插值生成 Inferno 风格 LUT (n, 3) uint8。"""
+    ctrl = np.array([
+        [  0,   0,   4], [ 22,  11,  57], [ 66,  10, 104],
+        [106,  23, 110], [147,  38, 103], [188,  55,  84],
+        [221,  81,  58], [243, 118,  27], [252, 165,  10],
+        [246, 215,  70], [252, 255, 164],
+    ], dtype=np.float64)
+    result = np.zeros((n, 3), dtype=np.uint8)
+    for i in range(n):
+        t = i / (n - 1)
+        idx = t * (len(ctrl) - 1)
+        lo = int(idx)
+        hi = min(lo + 1, len(ctrl) - 1)
+        f = idx - lo
+        result[i] = np.clip(ctrl[lo] * (1 - f) + ctrl[hi] * f, 0, 255).astype(np.uint8)
+    return result
+
+INFERNO_LUT = _build_inferno_lut(256)
+
+
+def inferno_colormap(t: float) -> tuple:
+    """将 [0,1] 浮点值映射为 (R,G,B) 0-255 元组。"""
+    idx = int(max(0.0, min(1.0, t)) * 255)
+    return int(INFERNO_LUT[idx][0]), int(INFERNO_LUT[idx][1]), int(INFERNO_LUT[idx][2])
+
+
 GLOBAL_QSS = f"""
 /* ── 全局 ── */
 QWidget {{
